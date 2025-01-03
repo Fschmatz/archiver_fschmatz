@@ -1,0 +1,35 @@
+name: archiver_fschmatz
+description: "A Flutter project."
+publish_to: 'none'
+version: 0.0.5
+
+environment:
+  sdk: '>=3.3.1 <4.0.0'
+
+dependencies:
+  flutter:
+    sdk: flutter
+  http:
+  path_provider:
+  provider:
+  shared_preferences:
+  share_plus: ^10.0.0
+  url_launcher:
+  jiffy: ^6.3.2
+  easy_dynamic_theme:
+  dynamic_color: ^1.7.0
+  fluttertoast:
+  sqflite:
+  mongo_dart: ^0.10.3
+  permission_handler: ^11.3.0
+  detectable_text_field: ^2.0.3
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_lints: ^3.0.0
+
+flutter:
+  uses-material-design: true
+  assets:
+    - assets/
