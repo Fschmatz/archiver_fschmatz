@@ -22,44 +22,36 @@ class NoteService {
     return resp.isNotEmpty ? resp.map((map) => Note.fromMap(map)).toList() : [];
   }
 
-  void insert(Note note) async {
+  Future<void> insert(Note note) async {
     Map<String, dynamic> row = note.toMap();
 
     await dbNote.insert(row);
   }
 
-  void update(Note note) async {
-    Map<String, dynamic> row = {
-      NoteDao.columnId: note.id,
-      NoteDao.columnText: note.text
-      /*,
-      NoteDao.columnArchived: note.archived,
-      NoteDao.columnCreationDate: note.creationDate*/
-    };
-
-    await dbNote.update(row);
+  Future<void> update(Note note) async {
+    await dbNote.update(note.toMap());
   }
 
-  void delete(int idNote) async {
+  Future<void> delete(int idNote) async {
     await dbNote.delete(idNote);
   }
 
-  void softDelete(Note note) async {
+  Future<void> softDelete(Note note) async {
     note.deleted = 1;
 
-    await dbNote.update(note.toMap());
+    await update(note);
   }
 
-  void unarchiveNote(Note note) async {
+  Future<void> unarchiveNote(Note note) async {
     note.archived = 0;
 
-    await dbNote.update(note.toMap());
+    await update(note);
   }
 
-  void archiveNote(Note note) async {
+  Future<void> archiveNote(Note note) async {
     note.archived = 1;
 
-    await dbNote.update(note.toMap());
+    await update(note);
   }
 
   Future<List<Map<String, dynamic>>> findAllNotes() {
@@ -71,18 +63,11 @@ class NoteService {
   }
 
   Future<void> insertNotesFromRestoreBackup(List<dynamic> jsonData) async {
-    for (dynamic item in jsonData) {
-      await _insertNoteFromBackup(Note.fromMap(item));
-    }
+    List<Map<String, dynamic>> listToInsert = jsonData.map((item) {
+      return Note.fromMap(item).toMap();
+    }).toList();
+
+    await dbNote.insertBatchForBackup(listToInsert);
   }
 
-  Future<void> _insertNoteFromBackup(Note note) async {
-    Map<String, dynamic> row = {
-      NoteDao.columnText: note.text,
-      NoteDao.columnArchived: note.archived,
-      NoteDao.columnCreationDate: note.creationDate
-    };
-
-    await dbNote.insert(row);
-  }
 }

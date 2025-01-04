@@ -1,11 +1,10 @@
-/*
-import 'package:flutter/material.dart';
 
-import 'app_details.dart';
-import 'backup_utils.dart';
+import 'package:flutter/material.dart';
+import '../app_details.dart';
+import '../backup_utils.dart';
+
 
 class DialogBackup extends StatefulWidget {
-
   bool isCreateBackup;
   Function()? reloadHomeFunction;
 
@@ -55,4 +54,3 @@ class _DialogBackupState extends State<DialogBackup> {
     );
   }
 }
-*/

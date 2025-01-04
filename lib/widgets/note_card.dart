@@ -1,34 +1,52 @@
 import 'dart:async';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:share_plus/share_plus.dart';
 import '../entity/note.dart';
+import '../enum/page_list_type.dart';
 import '../pages/store_note.dart';
 import '../service/note_service.dart';
 
 class NoteCard extends StatefulWidget {
   final Note note;
-  final int index;
-  final Function() refreshHome;
+  final Function()? reloadNotes;
+  final PageListType pageListType;
 
-  const NoteCard({super.key, required this.note, required this.index, required this.refreshHome});
+  const NoteCard({super.key, required this.note, this.reloadNotes, required this.pageListType});
 
   @override
   State<NoteCard> createState() => _NoteCardState();
 }
 
 class _NoteCardState extends State<NoteCard> {
-  NoteService noteService = NoteService();
+  final NoteService _noteService = NoteService();
+  bool _isHomePage = false;
+  bool _isArchivePage = false;
+  bool _isTrashPage = false;
+
+  @override
+  void initState() {
+    super.initState();
+
+    _isHomePage = widget.pageListType == PageListType.home;
+    _isArchivePage = widget.pageListType == PageListType.archive;
+    _isTrashPage = widget.pageListType == PageListType.trash;
+  }
+
+  bool isNotTrashPage(){
+    return !_isTrashPage;
+  }
 
   Future<void> _softDeleteNote() async {
-    noteService.softDelete(widget.note);
+    _noteService.softDelete(widget.note);
   }
 
   Future<void> _archiveNote() async {
-    noteService.archiveNote(widget.note);
+    _noteService.archiveNote(widget.note);
   }
 
   Future<void> _unarchiveNote() async {
-    noteService.unarchiveNote(widget.note);
+    _noteService.unarchiveNote(widget.note);
   }
 
   void openEditPage() {
@@ -36,8 +54,8 @@ class _NoteCardState extends State<NoteCard> {
         context,
         MaterialPageRoute(
           builder: (BuildContext context) => StoreNote(
-            refreshHome: widget.refreshHome,
-            note: null,
+            refreshHome: widget.reloadNotes!,
+            note: widget.note,
             isInsert: false,
             isUpdate: true,
           ),
@@ -62,25 +80,28 @@ class _NoteCardState extends State<NoteCard> {
                     trailing: Text(widget.note.formattedCreationDate, style: const TextStyle(fontSize: 14)),
                   ),
                   const Divider(),
-                  ListTile(
-                    leading: notArchived ? const Icon(Icons.archive_outlined) : const Icon(Icons.unarchive_outlined),
-                    title: notArchived
-                        ? const Text(
-                            "Archive",
-                          )
-                        : const Text(
-                            "Unarchive",
-                          ),
-                    onTap: () {
-                      if (notArchived) {
-                        _archiveNote();
-                      } else {
-                        _unarchiveNote();
-                      }
+                  Visibility(
+                    visible: isNotTrashPage(),
+                    child: ListTile(
+                      leading: notArchived ? const Icon(Icons.archive_outlined) : const Icon(Icons.unarchive_outlined),
+                      title: notArchived
+                          ? const Text(
+                              "Archive",
+                            )
+                          : const Text(
+                              "Unarchive",
+                            ),
+                      onTap: () {
+                        if (notArchived) {
+                          _archiveNote();
+                        } else {
+                          _unarchiveNote();
+                        }
 
-                      widget.refreshHome();
-                      Navigator.of(context).pop();
-                    },
+                        widget.reloadNotes!();
+                        Navigator.of(context).pop();
+                      },
+                    ),
                   ),
                   ListTile(
                     leading: const Icon(Icons.share_outlined),
@@ -92,16 +113,19 @@ class _NoteCardState extends State<NoteCard> {
                       Share.share("${widget.note.text}");
                     },
                   ),
-                  ListTile(
-                    leading: const Icon(Icons.delete_outline_outlined),
-                    title: const Text(
-                      "Delete",
-                      style: TextStyle(fontSize: 16),
+                  Visibility(
+                    visible: isNotTrashPage(),
+                    child: ListTile(
+                      leading: const Icon(Icons.delete_outline_outlined),
+                      title: const Text(
+                        "Delete",
+                        style: TextStyle(fontSize: 16),
+                      ),
+                      onTap: () {
+                        Navigator.of(context).pop();
+                        showAlertDialogOkDelete(context);
+                      },
                     ),
-                    onTap: () {
-                      Navigator.of(context).pop();
-                      showAlertDialogOkDelete(context);
-                    },
                   ),
                 ],
               ),
@@ -128,7 +152,7 @@ class _NoteCardState extends State<NoteCard> {
               ),
               onPressed: () {
                 _softDeleteNote();
-                widget.refreshHome();
+                widget.reloadNotes!();
                 Navigator.of(context).pop();
               },
             )
@@ -140,8 +164,7 @@ class _NoteCardState extends State<NoteCard> {
 
   @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-    TextStyle styleSubtitle = TextStyle(fontSize: 14, color: theme.hintColor);
+    TextStyle styleSubtitle = const TextStyle(fontSize: 14);
 
     return Card.outlined(
       margin: const EdgeInsets.fromLTRB(16, 0, 16, 0),
@@ -149,7 +172,7 @@ class _NoteCardState extends State<NoteCard> {
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(12),
         ),
-        onTap: openEditPage,
+        onTap: isNotTrashPage() ? openEditPage : null,
         onLongPress: openBottomMenu,
         title: Text(widget.note.text!, maxLines: 5, overflow: TextOverflow.ellipsis, style: styleSubtitle),
       ),

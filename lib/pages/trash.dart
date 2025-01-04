@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
 import '../entity/note.dart';
+import '../enum/page_list_type.dart';
 import '../service/note_service.dart';
-import 'notes_list.dart';
+import '../widgets/notes_list.dart';
 
 class Trash extends StatefulWidget {
   const Trash({super.key});
@@ -11,6 +12,7 @@ class Trash extends StatefulWidget {
 }
 
 class _TrashState extends State<Trash> {
+  final PageListType _pageListType = PageListType.trash;
   List<Note> _notes = [];
   bool _isLoading = false;
 
@@ -42,7 +44,7 @@ class _TrashState extends State<Trash> {
           ? const Center(child: CircularProgressIndicator())
           : _notes.isEmpty
           ? const Center(child: Text("Nothing..."))
-          : NotesList(notes: _notes),
+          : NotesList(notes: _notes, reloadNotes: null, pageListType: _pageListType),
     );
   }
 }

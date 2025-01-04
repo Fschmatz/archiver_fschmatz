@@ -3,11 +3,12 @@ import 'package:archiver_fschmatz/pages/store_note.dart';
 import 'package:archiver_fschmatz/pages/trash.dart';
 import 'package:flutter/material.dart';
 import '../entity/note.dart';
+import '../enum/page_list_type.dart';
 import '../service/note_service.dart';
 import '../service/sync_service.dart';
 import '../utils/app_details.dart';
 import 'archive.dart';
-import 'notes_list.dart';
+import '../widgets/notes_list.dart';
 
 class Home extends StatefulWidget {
   const Home({super.key});
@@ -17,6 +18,7 @@ class Home extends StatefulWidget {
 }
 
 class _HomeState extends State<Home> {
+  final PageListType _pageListType = PageListType.home;
   List<Note> _notes = [];
   bool _isLoading = false;
   bool _isSynchronizing = false;
@@ -57,39 +59,43 @@ class _HomeState extends State<Home> {
         appBar: AppBar(
           title: Text(AppDetails.appNameHomePage),
           actions: [
-            IconButton(
-              icon: const Icon(Icons.sync_outlined),
-              onPressed: _syncNotesWithMongo,
-            ),
-            IconButton(
-                icon: const Icon(Icons.archive_outlined),
-                onPressed: () {
-                  Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (BuildContext context) => const Archive(),
-                      ));
-                }),
-            IconButton(
-                icon: const Icon(Icons.delete_outline),
-                onPressed: () {
-                  Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (BuildContext context) => const Trash(),
-                      ));
-                }),
-            IconButton(
-                icon: const Icon(
-                  Icons.settings_outlined,
-                ),
-                onPressed: () {
-                  Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (BuildContext context) => const Settings(),
-                      ));
-                }),
+            PopupMenuButton<int>(
+                icon: const Icon(Icons.more_vert_outlined),
+                itemBuilder: (BuildContext context) => <PopupMenuItem<int>>[
+                      const PopupMenuItem<int>(value: 0, child: Text('Sync with Mongo')),
+                      const PopupMenuItem<int>(value: 1, child: Text('Archive')),
+                      const PopupMenuItem<int>(value: 2, child: Text('Trash')),
+                      const PopupMenuItem<int>(value: 3, child: Text('Settings')),
+                    ],
+                onSelected: (int value) {
+                  switch (value) {
+                    case 0:
+                      _syncNotesWithMongo();
+                      break;
+                    case 1:
+                      Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (BuildContext context) => const Archive(),
+                          ));
+                      break;
+                    case 2:
+                      Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (BuildContext context) => const Trash(),
+                          ));
+                      break;
+                    case 3:
+                      Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (BuildContext context) => Settings(
+                              reloadNotes: _loadNotes,
+                            ),
+                          ));
+                  }
+                })
           ],
         ),
         body: Stack(
@@ -106,7 +112,7 @@ class _HomeState extends State<Home> {
                 ? const Center(child: CircularProgressIndicator())
                 : _notes.isEmpty
                     ? const Center(child: Text("Nothing..."))
-                    : NotesList(notes: _notes),
+                    : NotesList(notes: _notes, reloadNotes: _loadNotes, pageListType: _pageListType),
           ],
         ),
         floatingActionButton: FloatingActionButton(

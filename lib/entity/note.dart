@@ -33,7 +33,7 @@ class Note {
         text: text,
         creationDate: DateTime.now().toIso8601String(),
         lastModifiedDate: DateTime.now().toIso8601String(),
-        lastModifiedDevice: DeviceType.PHONE.id,
+        lastModifiedDevice: DeviceType.phone.id,
         version: 1);
   }
 

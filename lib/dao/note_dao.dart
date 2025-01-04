@@ -98,6 +98,20 @@ class NoteDao {
     return await db.rawQuery('SELECT * FROM $table WHERE $columnDeleted = 1 ORDER BY id ASC');
   }
 
+  Future<void> insertBatchForBackup(List<Map<String, dynamic>> list) async {
+    Database db = await instance.database;
+
+    await db.transaction((txn) async {
+      final batch = txn.batch();
+
+      for (final data in list) {
+        batch.insert(table, data);
+      }
+
+      await batch.commit(noResult: true);
+    });
+  }
+
 /*
   Future<List<Map<String, dynamic>>> getUnsyncedTexts() async {
     Database db = await instance.database;

@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
 import '../entity/note.dart';
+import '../enum/page_list_type.dart';
 import '../service/note_service.dart';
-import 'notes_list.dart';
+import '../widgets/notes_list.dart';
 
 class Archive extends StatefulWidget {
   const Archive({super.key});
@@ -11,6 +12,7 @@ class Archive extends StatefulWidget {
 }
 
 class _ArchiveState extends State<Archive> {
+  final PageListType _pageListType = PageListType.archive;
   List<Note> _notes = [];
   bool _isLoading = false;
 
@@ -42,7 +44,7 @@ class _ArchiveState extends State<Archive> {
           ? const Center(child: CircularProgressIndicator())
           : _notes.isEmpty
               ? const Center(child: Text("Nothing..."))
-              : NotesList(notes: _notes),
+              : NotesList(notes: _notes, reloadNotes: _loadNotes, pageListType: _pageListType,),
     );
   }
 }

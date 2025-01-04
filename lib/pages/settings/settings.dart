@@ -1,13 +1,16 @@
 import 'package:flutter/material.dart';
 import 'package:easy_dynamic_theme/easy_dynamic_theme.dart';
 import '../../utils/app_details.dart';
+import '../../utils/widgets/dialog_backup.dart';
 import '../../utils/widgets/dialog_select_theme.dart';
 import '../../utils/utils.dart';
 import 'app_info.dart';
 import 'changelog.dart';
 
 class Settings extends StatefulWidget {
-   const Settings({super.key});
+   final Function() reloadNotes;
+
+   const Settings({super.key, required this.reloadNotes});
 
    @override
    State<Settings> createState() => _SettingsState();
@@ -56,7 +59,7 @@ class _SettingsState extends State<Settings> {
                 Utils().getThemeStringFormatted(EasyDynamicTheme.of(context).themeMode),
               ),
             ),
-           /* ListTile(
+            ListTile(
               title: Text("Backup", style: TextStyle(fontSize: 14, fontWeight: FontWeight.w500, color: themeColorApp)),
             ),
 
@@ -64,7 +67,7 @@ class _SettingsState extends State<Settings> {
               onTap: () => showDialog(
                   context: context,
                   builder: (BuildContext context) {
-                    return DialogBackup( isCreateBackup: true,  reloadHomeFunction: widget.refreshHome,);
+                    return DialogBackup( isCreateBackup: true,  reloadHomeFunction: widget.reloadNotes,);
                   }),
               leading: const Icon(Icons.save_outlined),
               title: const Text(
@@ -75,13 +78,13 @@ class _SettingsState extends State<Settings> {
               onTap: () => showDialog(
                   context: context,
                   builder: (BuildContext context) {
-                    return DialogBackup( isCreateBackup: false,  reloadHomeFunction: widget.refreshHome,);
+                    return DialogBackup( isCreateBackup: false,  reloadHomeFunction: widget.reloadNotes,);
                   }),
               leading: const Icon(Icons.settings_backup_restore_outlined),
               title: const Text(
                 "Restore from backup",
               ),
-            ),*/
+            ),
             ListTile(
               title: Text("About", style: TextStyle(fontSize: 14, fontWeight: FontWeight.w500, color: themeColorApp)),
             ),

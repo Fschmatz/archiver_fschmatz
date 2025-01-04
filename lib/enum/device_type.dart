@@ -1,6 +1,6 @@
 enum DeviceType {
-  PHONE,
-  EXTENSION
+  phone,
+  extension
 }
 
 extension DeviceTypeExtension on DeviceType {
@@ -8,10 +8,10 @@ extension DeviceTypeExtension on DeviceType {
     switch (input.toUpperCase()) {
       case 'P':
       case 'PHONE':
-        return DeviceType.PHONE;
+        return DeviceType.phone;
       case 'E':
       case 'EXTENSION':
-        return DeviceType.EXTENSION;
+        return DeviceType.extension;
       default:
         throw ArgumentError('Invalid device type: $input');
     }
@@ -19,18 +19,18 @@ extension DeviceTypeExtension on DeviceType {
 
   String get id {
     switch (this) {
-      case DeviceType.PHONE:
+      case DeviceType.phone:
         return 'P';
-      case DeviceType.EXTENSION:
+      case DeviceType.extension:
         return 'E';
     }
   }
 
   String get name {
     switch (this) {
-      case DeviceType.PHONE:
+      case DeviceType.phone:
         return 'Phone';
-      case DeviceType.EXTENSION:
+      case DeviceType.extension:
         return 'Extension';
     }
   }
